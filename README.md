@@ -83,12 +83,13 @@ Stores the input data received via the API when saving the records.
 
 **Example Create Statement:**
 
-```sql
+<pre>
 CREATE TABLE DataRecords (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Code INT NOT NULL,
     Value NVARCHAR(MAX) NOT NULL
 );
+</pre>
 
 ---
 
@@ -119,14 +120,15 @@ Used by the `LoggingActionFilter` to record details about each HTTP request and 
 
 ### Example Create Statement
 
-```sql
+
+<pre>
 CREATE TABLE LogRecords (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Request NVARCHAR(MAX),
     Response NVARCHAR(MAX),
     Timestamp DATETIME DEFAULT GETUTCDATE()
 );
-
+</pre>
 
 ## How These Tables Are Used in the Application
 
