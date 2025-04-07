@@ -88,7 +88,7 @@ CREATE TABLE DataRecords (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Code INT NOT NULL,
     Value NVARCHAR(MAX) NOT NULL
-);
+);```
 
 ---
 
