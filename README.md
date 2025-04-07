@@ -53,3 +53,91 @@ Logs are stored in the `LogRecords` table, assisting in monitoring and debugging
 - **Run the application:**  
   Use the .NET CLI or your IDE to start the application.
 - Use tools like Postman or curl to test the API endpoints.
+
+
+# Database Schema Documentation
+
+This document describes the table structures used in the ASP.NET Core Logging API project, specifically for Task 1. The API handles data saving and logging of HTTP requests/responses.
+
+---
+
+## 1. Table: DataRecords
+
+**Purpose:**  
+Stores the input data received via the API when saving the records.
+
+**Structure:**
+
+- **Id**  
+  - *Data Type:* INT  
+  - *Properties:* Auto-increment (IDENTITY(1,1)), Primary Key  
+  - *Description:* A unique identifier for each record.
+
+- **Code**  
+  - *Data Type:* INT, NOT NULL  
+  - *Description:* The numeric code extracted from the key of the input JSON object.
+
+- **Value**  
+  - *Data Type:* NVARCHAR(MAX), NOT NULL  
+  - *Description:* The value extracted from the input JSON object's value.
+
+**Example Create Statement:**
+
+```sql
+CREATE TABLE DataRecords (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Code INT NOT NULL,
+    Value NVARCHAR(MAX) NOT NULL
+);
+
+---
+
+## 2. Table: LogRecords
+
+**Purpose:**  
+Used by the `LoggingActionFilter` to record details about each HTTP request and its corresponding response.
+
+### Structure
+
+- **Id**  
+  - **Data Type:** INT  
+  - **Properties:** Auto-increment (IDENTITY(1,1)), Primary Key  
+  - **Description:** A unique identifier for each log record.
+
+- **Request**  
+  - **Data Type:** NVARCHAR(MAX)  
+  - **Description:** Contains the request information (e.g., URL path and HTTP method).
+
+- **Response**  
+  - **Data Type:** NVARCHAR(MAX)  
+  - **Description:** Contains the response information (e.g., HTTP status code).
+
+- **Timestamp**  
+  - **Data Type:** DATETIME  
+  - **Default Value:** GETUTCDATE() (if set at the database level, or provided programmatically)  
+  - **Description:** The moment when the request was processed, using UTC time.
+
+### Example Create Statement
+
+```sql
+CREATE TABLE LogRecords (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Request NVARCHAR(MAX),
+    Response NVARCHAR(MAX),
+    Timestamp DATETIME DEFAULT GETUTCDATE()
+);
+
+
+## How These Tables Are Used in the Application
+
+### DataRecords:
+When a client sends a `POST` request to `/api/data/save`, the API:
+- Accepts a JSON array consisting of key-value pairs.
+- Converts each pair into a record where the key becomes the **Code** and the value becomes **Value**.
+- Clears the existing data in the `DataRecords` table before inserting the new records (note that this does not reset the auto-increment counter unless explicitly reset).
+
+### LogRecords:
+For every HTTP request, the `LoggingActionFilter`:
+- Captures request details (such as the HTTP method and URL path) and the response's status code.
+- Constructs a log record containing this information along with a timestamp.
+- Inserts the log record into the `LogRecords` table, providing an audit trail for monitoring and debugging.
